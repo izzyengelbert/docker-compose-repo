@@ -1,0 +1,48 @@
+version: "3.7"
+services:
+  mongo1:
+    hostname: mongo1
+    container_name: localmongo1
+    image: mongo
+    ports:
+      - 37027:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    healthcheck:
+      test: test $$(echo "rs.slaveOk().ok || rs.status().ok" | mongo --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+    environment:
+      MONGO_REPLICA_SET_NAME: rs0
+    volumes:
+      - ./mongo/data1/db:/data/db
+      - ./mongo/data1/configdb:/data/configdb
+      - ./keyfile:/data/keyfile
+  mongo2:
+    hostname: mongo2
+    container_name: localmongo2
+    image: mongo
+    ports:
+    - 37028:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    environment:
+      MONGO_REPLICA_SET_NAME: rs0
+    volumes:
+      - ./mongo/data2/db:/data/db
+      - ./mongo/data2/configdb:/data/configdb
+      - ./keyfile:/data/keyfile
+  mongo3:
+    hostname: mongo3
+    container_name: localmongo3
+    image: mongo
+    ports:
+    - 37029:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    environment:
+      MONGO_REPLICA_SET_NAME: rs0
+    volumes:
+      - ./mongo/data3/db:/data/db
+      - ./mongo/data3/configdb:/data/configdb
+      - ./keyfile:/data/keyfile

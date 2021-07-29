@@ -1,0 +1,73 @@
+Step 1: start the mongo databases
+
+docker-compose -f docker-compose.unsecured.yaml up -d
+
+Step 2: exec into one of the mongos:
+
+docker exec -it localmongo1 /bin/bash
+
+Step 3: access mongo console
+
+mongo
+
+Step 4: configure replica set by pasting the following
+
+rs.initiate(
+  {
+    _id : 'rs0',
+    members: [
+      { _id : 0, host : "mongo1:27017" },
+      { _id : 1, host : "mongo2:27017" },
+      { _id : 2, host : "mongo3:27017" }
+    ]
+  }
+)
+
+#optional
+
+rs.reconfig(
+  {
+    _id : 'rs0',
+    members: [
+      { _id : 0, host : "mongo1:27017" },
+      { _id : 1, host : "mongo2:27017" },
+      { _id : 2, host : "mongo3:27017" }
+    ]
+  }
+)
+
+step 5 add admin
+
+use admin
+
+db.createUser({
+  user: "userAdmin",
+  pwd: "password",
+  roles: [
+    "userAdminAnyDatabase",
+    "readWriteAnyDatabase"
+  ]
+})
+
+
+step 6 stop unsecured containers
+
+docker-compose stop
+
+step 7 generate keyfile
+
+openssl rand -base64 756 > ./keyfile
+chmod 400 ./keyfile
+
+step 8 run docker-compose.yaml to start mongodb with auth
+
+docker-compose up -d
+
+
+
+# optional for local development
+sudo echo "127.0.0.1 mongo1
+          127.0.0.1 mongo2
+          127.0.0.1 mongo3
+          127.0.0.1 mongo
+          " | sudo tee -a /etc/hos

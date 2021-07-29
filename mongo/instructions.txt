@@ -1,0 +1,32 @@
+Step 1: start the mongo databases
+
+docker-compose up
+or
+docker-compose up -d
+
+Step 2: exec into one of the mongos:
+
+docker exec -it localmongo1 /bin/bash
+
+Step 3: access mongo console
+
+mongo
+
+Step 4: configure replica set by pasting the following
+
+rs.initiate(
+  {
+    _id : 'rs0',
+    members: [
+      { _id : 0, host : "mongo1:27017" },
+      { _id : 1, host : "mongo2:27017" },
+      { _id : 2, host : "mongo3:27017" }
+    ]
+  }
+)
+
+sudo echo "127.0.0.1 mongo1
+          127.0.0.1 mongo2
+          127.0.0.1 mongo3
+          127.0.0.1 mongo
+          " | sudo tee -a /etc/hosts

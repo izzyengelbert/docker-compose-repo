@@ -1,0 +1,61 @@
+version: "3.7"
+services:
+  mongo1:
+    hostname: mongo1
+    container_name: localmongo1
+    image: mongo
+    ports:
+      - 37027:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--auth", "--bind_ip_all", "--replSet", "rs0", "-keyFile", "/data/keyfile" ]
+    healthcheck:
+      test: test $$(echo "rs.slaveOk().ok || rs.status().ok" | mongo --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${username}
+      MONGO_INITDB_ROOT_PASSWORD: ${password}
+      MONGO_REPLICA_SET_NAME: rs0
+    volumes:
+      - ./mongo/data1/db:/data/db
+      - ./mongo/data1/configdb:/data/configdb
+      - ./keyfile:/data/keyfile
+  mongo2:
+    hostname: mongo2
+    container_name: localmongo2
+    image: mongo
+    ports:
+    - 37028:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--auth", "--bind_ip_all", "--replSet", "rs0", "-keyFile", "/data/keyfile" ]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${username}
+      MONGO_INITDB_ROOT_PASSWORD: ${password}
+    volumes:
+      - ./mongo/data3/db:/data/db
+      - ./mongo/data3/configdb:/data/configdb
+      - ./keyfile:/data/keyfile
+  mongo3:
+    hostname: mongo3
+    container_name: localmongo3
+    image: mongo
+    ports:
+    - 37029:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--auth", "--bind_ip_all", "--replSet", "rs0", "-keyFile", "/data/keyfile" ]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${username}
+      MONGO_INITDB_ROOT_PASSWORD: ${password}
+    volumes:
+      - ./mongo/data2/db:/data/db
+      - ./mongo/data2/configdb:/data/configdb
+      - ./keyfile:/data/keyfile
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: ${username}
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: ${password}
+  #     ME_CONFIG_MONGODB_SERVER: "localmongo1,localmongo2,localmongo3"

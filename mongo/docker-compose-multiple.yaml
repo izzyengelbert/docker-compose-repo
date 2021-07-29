@@ -1,0 +1,69 @@
+version: "3"
+services:
+  mongo1:
+    hostname: mongo1
+    container_name: localmongo1
+    image: mongo
+    ports:
+      - 27011:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_REPLICA_SET_NAME: rs0
+    healthcheck:
+      test: test $$(echo "rs.initiate().ok || rs.slaveOk().ok || rs.status().ok" | mongo --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+    volumes:
+      - ./mongo/data1/db:/data/db # This is where your volume will persist. e.g. VOLUME-DIR = ./volumes/mongodb
+      - ./mongo/data1/configdb:/data/configdb
+    command: mongod --auth --authenticationDatabase admin
+  mongo2:
+    hostname: mongo2
+    container_name: localmongo2
+    image: mongo
+    ports:
+    - 27012:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_REPLICA_SET_NAME: rs0
+    healthcheck:
+      test: test $$(echo "rs.initiate().ok || rs.slaveOk().ok || rs.status().ok" | mongo --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+    volumes:
+      - ./mongo/data2/db:/data/db # This is where your volume will persist. e.g. VOLUME-DIR = ./volumes/mongodb
+      - ./mongo/data2/configdb:/data/configdb
+  mongo3:
+    hostname: mongo3
+    container_name: localmongo3
+    image: mongo
+    ports:
+    - 27013:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_REPLICA_SET_NAME: rs0
+    healthcheck:
+      test: test $$(echo "rs.initiate().ok || rs.slaveOk().ok || rs.status().ok" | mongo --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+    volumes:
+      - ./mongo/data3/db:/data/db # This is where your volume will persist. e.g. VOLUME-DIR = ./volumes/mongodb
+      - ./mongo/data3/configdb:/data/configdb
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: username
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: "localmongo1,localmongo2,localmongo3"
