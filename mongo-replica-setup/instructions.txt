@@ -71,3 +71,7 @@ sudo echo "127.0.0.1 mongo1
           127.0.0.1 mongo3
           127.0.0.1 mongo
           " | sudo tee -a /etc/hos
+
+
+install cron inside container to run backup
+apt-get update && apt-get install -y cron
