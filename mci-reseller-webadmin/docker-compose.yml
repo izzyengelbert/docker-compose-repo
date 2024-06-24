@@ -1,0 +1,16 @@
+version: '3'
+services:
+  mci-reseller-webadmin:
+    image: asia-southeast2-docker.pkg.dev/beaming-sunset-394713/mediacloud/mci-reseller-webadmin:0.0.5-alpha-arm
+    hostname: mci-reseller-webadmin
+    env_file:
+      - ".env"
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+    volumes:
+      - type: bind
+        source: ./.env
+        target: /usr/src/nuxt-app/.env
+    restart: unless-stopped

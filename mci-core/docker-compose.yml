@@ -1,0 +1,12 @@
+version: '3'
+services:
+  mci-reseller-webadmin:
+    image: asia-southeast2-docker.pkg.dev/beaming-sunset-394713/mediacloud/mci-core:0.0.0-alpha
+    hostname: mci-core
+    env_file:
+      - ".env"
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 5001
+    restart: unless-stopped
